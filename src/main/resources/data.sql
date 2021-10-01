@@ -8,6 +8,7 @@ max_children INT,
 max_child_age INT,
 from_date DATE,
 to_date DATE,
+
 base_room_price DECIMAL(20,2),
 extra_adult DECIMAL(20,2),
 extra_child DECIMAL(20,2)
