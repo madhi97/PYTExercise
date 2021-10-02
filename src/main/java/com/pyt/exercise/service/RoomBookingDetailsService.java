@@ -7,8 +7,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 
 @Repository
@@ -27,8 +31,9 @@ public class RoomBookingDetailsService {
         RoomBookingDetailsModel bookingDetailsModel;
         InputRoomModel inputModel;
         Float roomRate = 0.0F;
+
         try{
-            inputModel = inputConverter(input);
+            inputModel = inputConverter(input.trim());
             bookingDetailsModel = getRoomDetails(inputModel.getInputRoomId(),inputModel.getCheckIn(),inputModel.getCheckOut());
 
             if(totalAdultsCount(inputModel,bookingDetailsModel) > bookingDetailsModel.getMax_adults()
@@ -36,30 +41,30 @@ public class RoomBookingDetailsService {
                 return "-1";
             }
 
+            roomRate = pricePerDay(inputModel,bookingDetailsModel) * totalDays(inputModel);
 
-        }
-        catch(DataAccessException e){
+
+        } catch(Exception e){
             e.printStackTrace();
             return "-1";}
-        catch (Exception e){
-            e.printStackTrace();
-            return "Unexpected Error";
-        }
 
-        return  roomRate.toString();
+        return  String.format("%.2f", roomRate);
 
     }
 
     public RoomBookingDetailsModel getRoomDetails(String room_id, String from_Date, String to_Date) throws DataAccessException {
 
         System.out.println(room_id + " " + from_Date + to_Date);
-        return namedParameterJdbcTemplate.queryForObject("select room_id,max_adults,max_children,max_child_age,from_date,to_date,base_room_price,extra_adult,extra_child from roombookingdetails where room_id  = :room_id and from_date <= (PARSEDATETIME('" + from_Date + "' , 'dd-MMM-yy' ,  'en')) and to_date >= (PARSEDATETIME('" + to_Date + "' , 'dd-MMM-yy' ,  'en'));", new MapSqlParameterSource("room_id", room_id), new RoomBookingDetailsMapper());
+        return namedParameterJdbcTemplate.queryForObject
+                ("select room_id,max_adults,max_children,max_child_age,from_date,to_date,base_room_price,extra_adult,extra_child from roombookingdetails where room_id  = :room_id and from_date <= (PARSEDATETIME('"
+                    + from_Date + "' , 'dd-MMM-yy' ,  'en')) and to_date >= (PARSEDATETIME('"
+                        + to_Date + "' , 'dd-MMM-yy' ,  'en'));", new MapSqlParameterSource("room_id", room_id), new RoomBookingDetailsMapper());
 
     }
 
     public InputRoomModel inputConverter(String input){
         InputRoomModel inputModel= new InputRoomModel();
-        ArrayList<Integer> childAge = new ArrayList<Integer>();
+        ArrayList<Integer> childAge = new ArrayList<>();
         String[] strArr = input.split(" ");
         inputModel.setInputRoomId(strArr[0]);
         inputModel.setCheckIn(strArr[1]);
@@ -67,7 +72,7 @@ public class RoomBookingDetailsService {
         inputModel.setAdultCount(Integer.parseInt(strArr[3]));
 
         if(strArr.length>4){
-            for(String str : Arrays.copyOfRange(strArr,4,strArr.length-1)){
+            for(String str : Arrays.copyOfRange(strArr,4,strArr.length)){
                 childAge.add(Integer.parseInt(str));
             }
         }
@@ -81,8 +86,9 @@ public class RoomBookingDetailsService {
         int totalAdults = inputModel.getAdultCount();
 
         for( int childAge : inputModel.getChildAge()){
-            if(childAge > bookingDetails.getMax_child_age())
+            if(childAge > bookingDetails.getMax_child_age() || childAge >= 18)
                 totalAdults+=1;
+
         }
         return totalAdults;
     }
@@ -92,7 +98,7 @@ public class RoomBookingDetailsService {
         return  inputModel.getAdultCount() + inputModel.getChildAge().size();
     }
 
-    public Float totalRate(InputRoomModel inputModel, RoomBookingDetailsModel bookingDetails ){
+    public Float pricePerDay(InputRoomModel inputModel, RoomBookingDetailsModel bookingDetails ){
         int totalPeople = totalPeopleCount(inputModel);
         int totalAdults = totalAdultsCount(inputModel,bookingDetails);
         int totalChild = totalPeople - totalAdults;
@@ -105,8 +111,29 @@ public class RoomBookingDetailsService {
         }
 
         price = price + (totalChild* bookingDetails.getExtra_child());
-
         return price;
+
+    }
+
+    public int totalDays(InputRoomModel inputModel) throws ParseException {
+        final DateFormat fmt = new SimpleDateFormat("dd-MMM-yyyy");
+
+        final Date  checkIn = fmt.parse(inputModel.getCheckIn());
+        final Date checkOut = fmt.parse(inputModel.getCheckOut());
+
+        long date1InMs = checkIn.getTime();
+        long date2InMs = checkOut.getTime();
+
+        long timeDiff = 0;
+        if(date1InMs > date2InMs) {
+            timeDiff = date1InMs - date2InMs;
+        } else {
+            timeDiff = date2InMs - date1InMs;
+        }
+
+        return (int) (timeDiff / (1000 * 60 * 60* 24));
+
+
 
     }
 
