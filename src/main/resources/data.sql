@@ -8,7 +8,6 @@ max_children INT,
 max_child_age INT,
 from_date DATE,
 to_date DATE,
-
 base_room_price DECIMAL(20,2),
 extra_adult DECIMAL(20,2),
 extra_child DECIMAL(20,2)
@@ -21,6 +20,4 @@ INSERT INTO roombookingdetails(room_id,max_adults,max_children,max_child_age,fro
 ('R124',3,2,12,PARSEDATETIME('01-SEP-2021' , 'dd-MMM-yy' ,  'en'),PARSEDATETIME('31-DEC-2021' , 'dd-MMM-yy' ,  'en'),2000,700,400),
 ('R124',3,2,12,PARSEDATETIME('01-FEB-2022' , 'dd-MMM-yy' ,  'en'),PARSEDATETIME('31-DEC-2022' , 'dd-MMM-yy' ,  'en'),3000,900,600)
 ;
-
 commit;
-select * from roombookingdetails;
