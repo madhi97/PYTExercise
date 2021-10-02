@@ -23,7 +23,7 @@ public class RoomBookingServiceTest {
     void roomAvailableTest(){
 
         roomObj.setNamedParameterJdbcTemplate(namedParameterJdbcTemplate);
-        Assertions.assertEquals(roomObj.getRoomRate("R123 01-OCT-2021 03-OCT-2021 2"),"2000.00");
+        Assertions.assertEquals(roomObj.getRoomRate("R124 01-OCT-2021 03-OCT-2021 2"),"4000.00");
         //Since it is Amount returning with 2 decimal and datatype is mentioned as Float in document
     }
 
