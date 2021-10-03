@@ -16,7 +16,9 @@ public class RoomBookingServiceTest {
 
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    RoomBookingDetailsService roomObj = new RoomBookingDetailsService();
+
+    @Autowired
+    RoomBookingDetailsService roomObj;
 
     @Test
     @DisplayName("Room Available")
