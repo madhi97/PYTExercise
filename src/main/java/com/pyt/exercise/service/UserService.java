@@ -16,10 +16,6 @@ public class UserService {
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate)
-    {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
 
 
     public Object getUserById(int user_Id){

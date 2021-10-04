@@ -21,8 +21,7 @@ public class RoomBookingDetailsService {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate)
-    {this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;}
+
 
 
 

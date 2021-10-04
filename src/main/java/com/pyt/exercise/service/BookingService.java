@@ -31,10 +31,7 @@ public class BookingService {
     Date date = new Date();
     String currentDate = formatter.format(date);
 
-    public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate)
-    {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
+
 
     public Object makeBooking(BookingModel booking){
         int trip_id;
